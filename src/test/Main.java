@@ -33,7 +33,7 @@ public class Main {
 		if(query==null) {
 			query = "";
 		}
-		ArrayList<float[][]> result = LineRegistry.drawLine(query);
+		ArrayList<float[][]> result = LineRegistry.drawLine("", "");
 		
 		return Response.status(Status.OK).entity(result).build();
 	}
@@ -62,6 +62,15 @@ public class Main {
 		return Response.status(Status.OK).entity(result).build();
 	}
 	
+	@GET
+	@Path("/queryPath")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response requestPath(@QueryParam("start") String start, @QueryParam("end") String end) throws NumberFormatException, SQLException, ClassNotFoundException  {
+
+		ArrayList<float[][]> result = LineRegistry.drawLine(start, end);
+		System.out.println("Done!");
+		return Response.status(Status.OK).entity(result).build();
+	}
 }
 
 

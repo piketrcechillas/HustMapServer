@@ -3,21 +3,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import processor.PathFinder;
+
 public class LineRegistry {
-	public static ArrayList<float[][]> drawLine(String query) throws NumberFormatException, SQLException, ClassNotFoundException {
+	public static ArrayList<float[][]> drawLine(String start, String end) throws NumberFormatException, SQLException, ClassNotFoundException {
 		
 		PostgreConnection connect = new PostgreConnection();
-		ResultSet rs;
+		ArrayList<String> rs = PathFinder.findPath(start, end);
 		ArrayList<float[][]> rsList = new ArrayList<>();
-		if(query == "") {
-			
-			rs = connect.runSql("select st_astext(geom) from public.line;");
-		}
-		else {
-			rs = connect.runSql("select st_astext(geom) from public.line;");
-		}
-	        while(rs.next()) {
-			   		 String result = rs.getString(1).substring(11, rs.getString(1).length()-1);
+		
+	   for(int j = 0; j < rs.size(); j++) {
+			   		 String result = rs.get(j).substring(11, rs.get(j).length()-1);
 			   		 String[] coordinates = result.split(",");
 			   		 float[][] arr = new float[coordinates.length][2];
 			   		 for(int i = 0; i < coordinates.length; i++) {
