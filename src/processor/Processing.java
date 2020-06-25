@@ -11,9 +11,12 @@ public class Processing {
 	public static HashMap<String, ArrayList<Line>> lineList = new HashMap<String, ArrayList<Line>>();
 	public static HashMap<String, Polygon> polygonList = new HashMap<String, Polygon>();
 	public static HashMap<String, Point> pointList = new HashMap<String, Point>();
+	public static HashMap<String, Room> roomList = new HashMap<String, Room>();
+	public static HashMap<String, String> idToPolygon = new HashMap<String, String>();
 	public static HashMap<String, ArrayList<String>> typePosition = new HashMap<String, ArrayList<String>>();
 	public static ArrayList<String> labelList = new ArrayList<String>();
 	public static ArrayList<String> typeList = new ArrayList<String>();
+	public static ArrayList<String> roomNameList = new ArrayList<String>();
 	public static void loadData() {
 		lineList.clear();
 		polygonList.clear();
@@ -85,6 +88,7 @@ public class Processing {
             	polygonList.put(temp.getName(), temp);
             	labelList.add(resultSet.getString(2));
             	typeList.add(resultSet.getString(3));
+            	idToPolygon.put(temp.getId(), temp.getName());
             	if (typePosition.get(resultSet.getString(3)) == null) {
             		ArrayList<String> value = new ArrayList<String>();
             		typePosition.put(resultSet.getString(3), value);
@@ -111,6 +115,22 @@ public class Processing {
             		typePosition.put(resultSet.getString(3), value);
             	}
             	typePosition.get(resultSet.getString(3)).add(resultSet.getString(2));
+            }
+            
+            // Load room
+            query = "select id, name, type, floor, room, polygon_id\r\n" + 
+            		"from room";
+            resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+            	Room temp = new Room();
+            	temp.setId(resultSet.getString(1));
+            	temp.setName(resultSet.getString(2));
+            	temp.setType(resultSet.getString(3));
+            	temp.setFloor(resultSet.getString(4));
+            	temp.setRoom(resultSet.getString(5));
+            	temp.setPolygon_id(resultSet.getString(6));
+            	roomList.put(temp.getName(), temp);
+            	roomNameList.add(resultSet.getString(2));
             }
             
             System.out.println("Load data done!");
@@ -349,6 +369,7 @@ public class Processing {
 		return label;
 	}
 	
+	// Lấy danh sách các type
 	public static ArrayList<String> getTypeList() {
 		ArrayList<String> type = new ArrayList<>();
 		Collections.sort(typeList);
@@ -360,8 +381,32 @@ public class Processing {
 		return type;
 	}
 	
+	// Lấy danh sách tên các địa điểm theo type
 	public static ArrayList<String> getNameByType(String type) {
 		return typePosition.get(type);
+	}
+	
+	// Lấy danh sách tên các phòng
+	public static ArrayList<String> getRoomNameList() {
+		ArrayList<String> roomName = new ArrayList<>();
+		Collections.sort(roomNameList);
+		for (int i=0; i<roomNameList.size(); i++) {
+			if(!roomName.contains(roomNameList.get(i))){
+				roomName.add(roomNameList.get(i));
+			}
+		}
+		return roomName;
+	}
+	
+	// Lấy thông tin phòng theo tên
+	public static ArrayList<String> getRoomInformation (String name) {
+		// Trả về theo thứ tự tên tòa nhà, tầng, phòng
+		ArrayList<String> result = new ArrayList<String>();
+		Room room = roomList.get(name);
+		result.add(idToPolygon.get(room.getPolygon_id()));
+		result.add(room.getFloor());
+		result.add(room.getRoom());
+		return result;
 	}
 }
 
