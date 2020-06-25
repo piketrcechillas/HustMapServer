@@ -353,8 +353,8 @@ public class Processing {
 		ArrayList<String> type = new ArrayList<>();
 		Collections.sort(typeList);
 		for (int i=0; i<typeList.size(); i++) {
-			if(!type.contains(labelList.get(i))){
-				type.add(labelList.get(i));
+			if(!type.contains(typeList.get(i))){
+				type.add(typeList.get(i));
 			}
 		}
 		return type;
