@@ -80,7 +80,7 @@ public class Processing {
             	temp.setGateTxt(resultSet.getString(6));
             	polygonList.put(temp.getName(), temp);
             }
-            
+            System.out.println("Initialization completed");
 		} catch (SQLException e) {
             System.out.println("Connection failure.");
             e.printStackTrace();

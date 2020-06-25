@@ -33,7 +33,7 @@ public class Main {
 		if(query==null) {
 			query = "";
 		}
-		ArrayList<float[][]> result = LineRegistry.drawLine("", "");
+		ArrayList<double[][]> result = LineRegistry.drawLine("", "");
 		
 		return Response.status(Status.OK).entity(result).build();
 	}
@@ -41,11 +41,9 @@ public class Main {
 	@GET
 	@Path("/queryPolygon")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response requestPolygon(@QueryParam("q") String query) throws NumberFormatException, SQLException, ClassNotFoundException  {
-		if(query==null) {
-			query = "";
-		}
-		ArrayList<float[][]> result = PolygonRegistry.drawPolygon(query);
+	public Response requestPolygon() throws NumberFormatException, SQLException, ClassNotFoundException  {
+
+		ArrayList<float[][]> result = PolygonRegistry.drawPolygon();
 		
 		return Response.status(Status.OK).entity(result).build();
 	}
@@ -67,7 +65,27 @@ public class Main {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response requestPath(@QueryParam("start") String start, @QueryParam("end") String end) throws NumberFormatException, SQLException, ClassNotFoundException  {
 
-		ArrayList<float[][]> result = LineRegistry.drawLine(start, end);
+		ArrayList<double[][]> result = LineRegistry.drawLine(start, end);
+		System.out.println("Done!");
+		return Response.status(Status.OK).entity(result).build();
+	}
+	
+	@GET
+	@Path("/queryFromGPS")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response requestPathFromGPS(@QueryParam("start") String start, @QueryParam("end") String end) throws NumberFormatException, SQLException, ClassNotFoundException  {
+
+		ArrayList<double[][]> result = LineRegistry.drawLineFromGPS(start, end);
+		System.out.println("Done!");
+		return Response.status(Status.OK).entity(result).build();
+	}
+	
+	@GET
+	@Path("/queryToGPS")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response requestPathToGPS(@QueryParam("start") String start, @QueryParam("end") String end) throws NumberFormatException, SQLException, ClassNotFoundException  {
+
+		ArrayList<double[][]> result = LineRegistry.drawLineToGPS(start, end);
 		System.out.println("Done!");
 		return Response.status(Status.OK).entity(result).build();
 	}

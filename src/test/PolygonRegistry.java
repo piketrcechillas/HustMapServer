@@ -4,18 +4,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class PolygonRegistry {
-	public static ArrayList<float[][]> drawPolygon(String query) throws NumberFormatException, SQLException, ClassNotFoundException {
+	public static ArrayList<float[][]> drawPolygon() throws NumberFormatException, SQLException, ClassNotFoundException {
 		
 		PostgreConnection connect = new PostgreConnection();
 		ResultSet rs;
 		ArrayList<float[][]> rsList = new ArrayList<>();
-		if(query == "") {
-			
-			rs = connect.runSql("select st_astext(geom) from public.polygon;");
-		}
-		else {
-			rs = connect.runSql("select st_astext(geom) from public.polygon;");
-		}
+
+			rs = connect.runSql("select st_astext(geom) from public.polygon where id=49;");
+
 	        while(rs.next()) {
 			   		 String result = rs.getString(1).substring(9, rs.getString(1).length()-2);
 			   		 String[] coordinates = result.split(",");
