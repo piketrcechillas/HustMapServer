@@ -1,5 +1,3 @@
-package processor;
-
 
 public class Line {
 	private int id;

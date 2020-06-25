@@ -1,5 +1,3 @@
-package processor;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,12 +8,16 @@ import java.util.*;
 
 public class Processing {
 	public static HashMap<String, ArrayList<Line>> lineList = new HashMap<String, ArrayList<Line>>();
+	public static HashMap<String, Polygon> polygonList = new HashMap<String, Polygon>();
 	
 	public static void loadData() {
 		lineList.clear();
+		polygonList.clear();
 		try (Connection connection = DriverManager.getConnection(
         		"jdbc:postgresql://hustmap.postgres.database.azure.com:5432/bkmap", "hustmap@hustmap", "Admin123")) {
 			Statement statement = connection.createStatement();
+			
+			// Load line
 			String query =  "select id, geom, oneway, no_car, no_motorbike, st_length(geom), " +
 					"st_startpoint(geom), st_endpoint(geom), " +
 					"st_astext(st_startpoint(geom)), st_astext(st_endpoint(geom)), st_astext(geom)\r\n" +
@@ -60,7 +62,22 @@ public class Processing {
                 	lineList.get(endpoint).add(temp2);
             	}
             }
-            System.out.println("Imported database. Mew mew");
+            
+            // Load polygon
+            query = "select id, name, type, geom, gate, st_astext(gate)\r\n" + 
+            		"from polygon";
+            resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+            	Polygon temp = new Polygon();
+            	temp.setId(resultSet.getString(1));
+            	temp.setName(resultSet.getString(2));
+            	temp.setType(resultSet.getString(3));
+            	temp.setGeom(resultSet.getString(4));
+            	temp.setGate(resultSet.getString(5));
+            	temp.setGateTxt(resultSet.getString(6));
+            	polygonList.put(temp.getName(), temp);
+            }
+            
 		} catch (SQLException e) {
             System.out.println("Connection failure.");
             e.printStackTrace();
@@ -112,10 +129,10 @@ public class Processing {
         		"jdbc:postgresql://hustmap.postgres.database.azure.com:5432/bkmap", "hustmap@hustmap", "Admin123")) {
         	Statement statement = connection.createStatement();
         	String query =  "select id, geom, oneway, no_car, no_motorbike, st_length(geom), " + 
-        					"st_astext(st_endpoint(st_ShortestLine(st_centroid('"+ end +"'), geom))), " +
+        					"st_astext('"+ end +"'), " +
         					"st_astext(geom)\r\n" +
         					"from subline\r\n" + 
-        					"order by st_length(st_ShortestLine(st_centroid('"+ end +"'), geom))\r\n" + 
+        					"order by st_length(st_ShortestLine('"+ end +"', geom))\r\n" + 
         					"limit 1";
         	ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
@@ -135,10 +152,10 @@ public class Processing {
             }
             query =  "select id, geom, oneway, no_car, no_motorbike, st_length(geom), " + 
             		"st_startpoint(geom), st_endpoint(geom), " +
-            		"st_astext(st_endpoint(st_ShortestLine(st_centroid('"+ start +"'), geom))), " +
+            		"st_astext('"+ start +"'), " +
             		"st_astext(geom)\r\n" +
 					"from subline\r\n" + 
-					"order by st_length(st_ShortestLine(st_centroid('"+ start +"'), geom))\r\n" + 
+					"order by st_length(st_ShortestLine('"+ start +"', geom))\r\n" + 
 					"limit 1";
         	resultSet = statement.executeQuery(query);
             while (resultSet.next()) {

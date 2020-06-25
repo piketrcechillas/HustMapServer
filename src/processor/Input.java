@@ -11,23 +11,12 @@ import java.util.*;
 public class Input {
 	public static String getName(String name) {
 		String geom = "";
-		try (Connection connection = DriverManager.getConnection(
-        		"jdbc:postgresql://hustmap.postgres.database.azure.com:5432/bkmap", "hustmap@hustmap", "Admin123")) {
-			Statement statement = connection.createStatement();
-			
-	        String query = "SELECT geom" + "\n" +
-	            			"FROM polygon" + "\n" +
-	            			"WHERE name='"+name+"'";
-	        ResultSet resultSet = statement.executeQuery(query);
-	        while (resultSet.next()) {
-	            geom = resultSet.getString(1);
-	        }
-	        System.out.println("Checked!");
+		if (Processing.polygonList.containsKey(name)) {
+			geom = Processing.polygonList.get(name).getGate();
 		}
-		catch (SQLException e) {
-            System.out.println("Connection failure.");
-            e.printStackTrace();
-        }
+		else {
+			System.out.println("Empty!");
+		}
 		return geom;
 	}
 }
