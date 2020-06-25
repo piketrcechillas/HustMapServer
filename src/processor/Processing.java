@@ -1,3 +1,4 @@
+package processor;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -36,6 +37,7 @@ public class Processing {
             	temp.setLength(resultSet.getFloat(6));
             	temp.setStartpoint(startpoint);
             	temp.setEndpoint(endpoint);
+            	temp.setStartXY(resultSet.getString(9));
             	temp.setEndXY(resultSet.getString(10));
             	temp.setTextGeom(resultSet.getString(11));
             	if (lineList.get(startpoint) == null) {
@@ -54,6 +56,7 @@ public class Processing {
                 	temp2.setStartpoint(endpoint);
                 	temp2.setEndpoint(startpoint);
                 	temp2.setEndXY(resultSet.getString(9));
+                	temp2.setStartXY(resultSet.getString(10));
                 	temp2.setTextGeom(resultSet.getString(11));
                 	if (lineList.get(endpoint) == null) {
                 		ArrayList<Line> value2 = new ArrayList<Line>();
@@ -129,7 +132,7 @@ public class Processing {
         		"jdbc:postgresql://hustmap.postgres.database.azure.com:5432/bkmap", "hustmap@hustmap", "Admin123")) {
         	Statement statement = connection.createStatement();
         	String query =  "select id, geom, oneway, no_car, no_motorbike, st_length(geom), " + 
-        					"st_astext('"+ end +"'), " +
+        					"st_astext(st_endpoint(st_ShortestLine('"+ end +"', geom))), " +
         					"st_astext(geom)\r\n" +
         					"from subline\r\n" + 
         					"order by st_length(st_ShortestLine('"+ end +"', geom))\r\n" + 
@@ -152,7 +155,7 @@ public class Processing {
             }
             query =  "select id, geom, oneway, no_car, no_motorbike, st_length(geom), " + 
             		"st_startpoint(geom), st_endpoint(geom), " +
-            		"st_astext('"+ start +"'), " +
+            		"st_astext(st_endpoint(st_ShortestLine('"+ start +"', geom))), " +
             		"st_astext(geom)\r\n" +
 					"from subline\r\n" + 
 					"order by st_length(st_ShortestLine('"+ start +"', geom))\r\n" + 
@@ -189,11 +192,26 @@ public class Processing {
             	closeSet.add(tmp);
                 closeId.add(tmp.getId());
             	if (tmp.getId() == endLine.getId()) {
+            		String epoint = "POINT(" + endX + " " + endY + ")";
+            		String spoint = "POINT(" + startX + " " + startY + ")";
+            		result.add(epoint);
             		result.add(tmp.getTextGeom());
             		while (tmp.getParent() != null) {
             			tmp = tmp.getParent();
             			result.add(tmp.getTextGeom());
             		}
+            		result.add(spoint);
+            		String tempS = result.get(2);
+            		String[] arr;
+            		tempS = tempS.substring(11, tempS.length()-1);
+            		arr = tempS.split(",");
+            		String eline = "LINESTRING(" + arr[0] + "," + endX + " " + endY + ")";
+            		tempS = result.get(result.size() - 3);
+            		tempS = tempS.substring(11, tempS.length()-1);
+            		arr = tempS.split(",");
+            		String sline = "LINESTRING(" + startX + " " + startY + "," + arr[1] + ")";
+            		result.set(1, eline);
+            		result.set(result.size() - 2, sline);
             		System.out.println(result.size());
             		return result;
             	}
@@ -250,7 +268,7 @@ public class Processing {
             Statement statement = connection.createStatement();
 			statement.execute("DELETE from result");
 	        int i;
-	        for (i = 1; i <= result.size(); i++) {
+	        for (i = 2; i <= result.size() - 1; i++) {
 	        	String line = result.get(i-1);
 	            statement.executeUpdate(
 	                	"INSERT INTO result (id, geom)" + "\n" +

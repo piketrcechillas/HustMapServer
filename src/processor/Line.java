@@ -1,3 +1,4 @@
+package processor;
 
 public class Line {
 	private int id;
@@ -14,6 +15,9 @@ public class Line {
 	private String endpoint;
 	private double endX;
 	private double endY;
+	private double startX;
+	private double startY;
+	
 	public Line() {
 		this.distance = 0;
 		this.curCost = 0;
@@ -112,5 +116,18 @@ public class Line {
 	}
 	public double getEndY() {
 		return this.endY;
+	}
+	public void setStartXY(String s) {
+		String[] arr;
+		s = s.substring(6, s.length()-1);
+		arr = s.split(" ");
+		this.startX = Double.parseDouble(arr[0]);
+		this.startY = Double.parseDouble(arr[1]);
+	}
+	public double getStartX() {
+		return this.startX;
+	}
+	public double getStartY() {
+		return this.startY;
 	}
 }
