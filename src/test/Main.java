@@ -8,6 +8,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import processor.Processing;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -88,6 +90,16 @@ public class Main {
 		ArrayList<double[][]> result = LineRegistry.drawLineToGPS(start, end);
 		System.out.println("Done!");
 		return Response.status(Status.OK).entity(result).build();
+	}
+	
+	@GET
+	@Path("/getLabel")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response requestLabel() throws NumberFormatException, SQLException, ClassNotFoundException  {
+
+		ArrayList<String> label = Processing.getLabelList();
+		System.out.println("Done!");
+		return Response.status(Status.OK).entity(label).build();
 	}
 }
 

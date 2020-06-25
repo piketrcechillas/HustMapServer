@@ -326,10 +326,13 @@ public class Processing {
 		return geom;
 	}
 
-	public static String[] getLabelList() {
-		String[] label = new String[labelList.size()];
+	public static ArrayList<String> getLabelList() {
+		ArrayList<String> label = new ArrayList<>();
+		Collections.sort(labelList);
 		for (int i=0; i<labelList.size(); i++) {
-			label[i] = labelList.get(i);
+			if(!label.contains(labelList.get(i))){
+				label.add(labelList.get(i));
+			}
 		}
 		return label;
 	}
