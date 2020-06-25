@@ -289,6 +289,21 @@ public class Processing {
         }
 	}
 	
+	public static String stringToGeom(String s) {
+		String geom = "";
+		try (Connection connection = DriverManager.getConnection(
+        		"jdbc:postgresql://hustmap.postgres.database.azure.com:5432/bkmap", "hustmap@hustmap", "Admin123")) {
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery("select st_geomfromtext('POINT(" + s + ")', 4326)");
+			while (resultSet.next()) {
+				geom = resultSet.getString(1);
+			}
+		} catch (SQLException e) {
+            System.out.println("Connection failure.");
+            e.printStackTrace();
+        }
+		return geom;
+	}
 }
 
 
