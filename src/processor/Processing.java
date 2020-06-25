@@ -81,6 +81,8 @@ public class Processing {
             	polygonList.put(temp.getName(), temp);
             }
             
+            System.out.println("First time initialization.");
+            
 		} catch (SQLException e) {
             System.out.println("Connection failure.");
             e.printStackTrace();
