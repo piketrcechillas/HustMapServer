@@ -81,8 +81,6 @@ public class Processing {
             	polygonList.put(temp.getName(), temp);
             }
             
-            System.out.println("First time initialization.");
-            
 		} catch (SQLException e) {
             System.out.println("Connection failure.");
             e.printStackTrace();
@@ -198,20 +196,24 @@ public class Processing {
             		String spoint = "POINT(" + startX + " " + startY + ")";
             		result.add(epoint);
             		result.add(tmp.getTextGeom());
+            		ArrayList<String> listP = new ArrayList<String>();
             		while (tmp.getParent() != null) {
             			tmp = tmp.getParent();
+            			if (tmp.getParent() != null) {
+	            			String tmpP = tmp.getStartX() + " " + tmp.getStartY() + "," +
+	            							tmp.getEndX() + " " + tmp.getEndY();
+	            			listP.add(tmpP);
+            			}
             			result.add(tmp.getTextGeom());
             		}
             		result.add(spoint);
-            		String tempS = result.get(2);
+            		String tempS = listP.get(0);
             		String[] arr;
-            		tempS = tempS.substring(11, tempS.length()-1);
             		arr = tempS.split(",");
-            		String eline = "LINESTRING(" + arr[0] + "," + endX + " " + endY + ")";
-            		tempS = result.get(result.size() - 3);
-            		tempS = tempS.substring(11, tempS.length()-1);
+            		String eline = "LINESTRING(" + arr[1] + "," + endX + " " + endY + ")";
+            		tempS = listP.get(listP.size() - 1);
             		arr = tempS.split(",");
-            		String sline = "LINESTRING(" + startX + " " + startY + "," + arr[1] + ")";
+            		String sline = "LINESTRING(" + startX + " " + startY + "," + arr[0] + ")";
             		result.set(1, eline);
             		result.set(result.size() - 2, sline);
             		System.out.println(result.size());
@@ -270,13 +272,16 @@ public class Processing {
             Statement statement = connection.createStatement();
 			statement.execute("DELETE from result");
 	        int i;
+	        String query = "INSERT INTO result (id, geom)" + "\n" + "VALUES ";
 	        for (i = 2; i <= result.size() - 1; i++) {
 	        	String line = result.get(i-1);
-	            statement.executeUpdate(
-	                	"INSERT INTO result (id, geom)" + "\n" +
-	                	"VALUES ('"+i+"', st_geomfromtext('"+line+"', 4326));"); 	
+	        	if (i == result.size() - 1) {
+	        		query += "('"+i+"', st_geomfromtext('"+line+"', 4326));";
+	        	} else {
+	        		query += "('"+i+"', st_geomfromtext('"+line+"', 4326)),\n";
+	        	}
 	        }
-	      
+	        statement.executeUpdate(query);
 	        System.out.println("Done!");	            	                       
         } catch (SQLException e) {
             System.out.println("Connection failure.");
