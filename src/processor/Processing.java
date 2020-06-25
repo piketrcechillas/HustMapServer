@@ -10,10 +10,12 @@ import java.util.*;
 public class Processing {
 	public static HashMap<String, ArrayList<Line>> lineList = new HashMap<String, ArrayList<Line>>();
 	public static HashMap<String, Polygon> polygonList = new HashMap<String, Polygon>();
-	
+	public static HashMap<String, Point> pointList = new HashMap<String, Point>();
+	public static ArrayList<String> labelList = new ArrayList<String>();
 	public static void loadData() {
 		lineList.clear();
 		polygonList.clear();
+		pointList.clear();
 		try (Connection connection = DriverManager.getConnection(
         		"jdbc:postgresql://hustmap.postgres.database.azure.com:5432/bkmap", "hustmap@hustmap", "Admin123")) {
 			Statement statement = connection.createStatement();
@@ -79,8 +81,27 @@ public class Processing {
             	temp.setGate(resultSet.getString(5));
             	temp.setGateTxt(resultSet.getString(6));
             	polygonList.put(temp.getName(), temp);
+            	labelList.add(resultSet.getString(2));
+            	System.out.println(resultSet.getString(2));
             }
             
+            // Load point
+            query = "select id, name, type, geom, st_astext(geom)\r\n" + 
+            		"from point";
+            resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+            	Point temp = new Point();
+            	temp.setId(resultSet.getString(1));
+            	temp.setName(resultSet.getString(2));
+            	temp.setType(resultSet.getString(3));
+            	temp.setGeom(resultSet.getString(4));
+            	temp.setTxtGeom(resultSet.getString(5));
+            	pointList.put(temp.getName(), temp);
+            	labelList.add(resultSet.getString(2));
+            	System.out.println(resultSet.getString(2));
+            }
+            
+            System.out.println("Load data done!");
 		} catch (SQLException e) {
             System.out.println("Connection failure.");
             e.printStackTrace();
@@ -303,6 +324,14 @@ public class Processing {
             e.printStackTrace();
         }
 		return geom;
+	}
+
+	public static String[] getLabelList() {
+		String[] label = new String[labelList.size()];
+		for (int i=0; i<labelList.size(); i++) {
+			label[i] = labelList.get(i);
+		}
+		return label;
 	}
 }
 

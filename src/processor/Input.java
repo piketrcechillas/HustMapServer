@@ -13,6 +13,8 @@ public class Input {
 		String geom = "";
 		if (Processing.polygonList.containsKey(name)) {
 			geom = Processing.polygonList.get(name).getGate();
+		} else if (Processing.pointList.containsKey(name)) {
+			geom = Processing.pointList.get(name).getGeom();
 		}
 		else {
 			System.out.println("Empty!");
