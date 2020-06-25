@@ -11,7 +11,9 @@ public class Processing {
 	public static HashMap<String, ArrayList<Line>> lineList = new HashMap<String, ArrayList<Line>>();
 	public static HashMap<String, Polygon> polygonList = new HashMap<String, Polygon>();
 	public static HashMap<String, Point> pointList = new HashMap<String, Point>();
+	public static HashMap<String, ArrayList<String>> typePosition = new HashMap<String, ArrayList<String>>();
 	public static ArrayList<String> labelList = new ArrayList<String>();
+	public static ArrayList<String> typeList = new ArrayList<String>();
 	public static void loadData() {
 		lineList.clear();
 		polygonList.clear();
@@ -82,7 +84,12 @@ public class Processing {
             	temp.setGateTxt(resultSet.getString(6));
             	polygonList.put(temp.getName(), temp);
             	labelList.add(resultSet.getString(2));
-            	System.out.println(resultSet.getString(2));
+            	typeList.add(resultSet.getString(3));
+            	if (typePosition.get(resultSet.getString(3)) == null) {
+            		ArrayList<String> value = new ArrayList<String>();
+            		typePosition.put(resultSet.getString(3), value);
+            	}
+            	typePosition.get(resultSet.getString(3)).add(resultSet.getString(2));
             }
             
             // Load point
@@ -98,7 +105,12 @@ public class Processing {
             	temp.setTxtGeom(resultSet.getString(5));
             	pointList.put(temp.getName(), temp);
             	labelList.add(resultSet.getString(2));
-            	System.out.println(resultSet.getString(2));
+            	typeList.add(resultSet.getString(3));
+            	if (typePosition.get(resultSet.getString(3)) == null) {
+            		ArrayList<String> value = new ArrayList<String>();
+            		typePosition.put(resultSet.getString(3), value);
+            	}
+            	typePosition.get(resultSet.getString(3)).add(resultSet.getString(2));
             }
             
             System.out.println("Load data done!");
@@ -335,6 +347,21 @@ public class Processing {
 			}
 		}
 		return label;
+	}
+	
+	public static ArrayList<String> getTypeList() {
+		ArrayList<String> type = new ArrayList<>();
+		Collections.sort(typeList);
+		for (int i=0; i<typeList.size(); i++) {
+			if(!type.contains(labelList.get(i))){
+				type.add(labelList.get(i));
+			}
+		}
+		return type;
+	}
+	
+	public static ArrayList<String> getNameByType(String type) {
+		return typePosition.get(type);
 	}
 }
 
